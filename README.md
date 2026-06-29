@@ -31,6 +31,26 @@
 npx skills add WebeyePR/gcp-kc-glossary-builder -g -y
 ```
 
+**作为 MCP Server 接入 IDE (Cursor / Claude Desktop / Windsurf)：**
+本工具原生支持 Model Context Protocol (MCP)。只需在你的 MCP 客户端配置文件中添加以下节点：
+```json
+"mcpServers": {
+  "gcp-glossary-builder": {
+    "command": "uv",
+    "args": [
+      "run",
+      "--with", "mcp>=1.0.0",
+      "--with", "google-cloud-dataplex",
+      "--with", "google-auth",
+      "--with", "requests",
+      "https://raw.githubusercontent.com/WebeyePR/gcp-kc-glossary-builder/main/mcp_server.py"
+    ]
+  }
+}
+```
+*提示：通过 `uv run` 直接运行远程脚本是接入 MCP 的最轻量级方式，你的 Cursor 将直接获得操纵 Dataplex 的能力。*
+
+
 **作为本地自动化工具链独立使用：**
 ```bash
 git clone git@github.com:WebeyePR/gcp-kc-glossary-builder.git

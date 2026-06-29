@@ -31,6 +31,26 @@ This suite is perfectly compatible with the open agent skills ecosystem. You can
 npx skills add WebeyePR/gcp-kc-glossary-builder -g -y
 ```
 
+**Connect as an MCP Server (Cursor / Claude Desktop / Windsurf):**
+This tool natively supports the Model Context Protocol (MCP). Just add the following configuration to your MCP client:
+```json
+"mcpServers": {
+  "gcp-glossary-builder": {
+    "command": "uv",
+    "args": [
+      "run",
+      "--with", "mcp>=1.0.0",
+      "--with", "google-cloud-dataplex",
+      "--with", "google-auth",
+      "--with", "requests",
+      "https://raw.githubusercontent.com/WebeyePR/gcp-kc-glossary-builder/main/mcp_server.py"
+    ]
+  }
+}
+```
+*Tip: Running the remote script directly via `uv run` is the most lightweight way to integrate with MCP, granting your Cursor instant capability to orchestrate Dataplex.*
+
+
 **As a standalone local automation toolbelt:**
 ```bash
 git clone git@github.com:WebeyePR/gcp-kc-glossary-builder.git
