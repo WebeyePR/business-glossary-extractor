@@ -1,7 +1,7 @@
-# 业务术语表提取工具 (Business Glossary Extractor)
+# Google Knowledge Catalog 术语自动化引擎 (GCP KC Glossary Builder)
 
-企业级、基于 Nuwa/Luban 标准提纯的自动化流水线，用于从非结构化数据源（Wiki、PRD、大文本文件、多文档）中提取业务术语定义，并将其同步到 Google Cloud Dataplex 中。
-> An enterprise-grade, Nuwa/Luban-distilled automated pipeline for extracting Business Glossary definitions from unstructured data sources (Wikis, PRDs, large text files, multiple documents) and synchronizing them into Google Cloud Dataplex.
+本项目是一套专为 **Google Cloud Knowledge Catalog (Dataplex KC)** 打造的全生命周期智能管控流水线（Agent Skill）。它彻底改变了传统人工手动梳理和录入数据字典的繁琐方式。
+> An enterprise-grade, Nuwa/Luban-distilled automated pipeline for extracting Business Glossary definitions from unstructured data sources and synchronizing them into Google Cloud Knowledge Catalog (Dataplex KC).
 
 ## 🌟 核心特性 (Key Features)
 
@@ -42,9 +42,9 @@ pip install -r requirements.txt
 python scripts/import_glossary.py --project_id=YOUR_PROJECT --project_num=YOUR_PROJECT_NUM --glossary_id=YOUR_GLOSSARY_ID --json_file=extracted.json
 ```
 
-### 2. 深度绑定 (Deep Binding: `bind_aspects.py`)
-扫描术语，解析其 `Description` 中的关联表，并自动附加 Dataplex 切面 (`has_calculation`, `has_physical_mapping`) 以及 BigQuery 底层实体链接 (Entry Links)。
-> Scans terms, parses their `Description` for related tables, and automatically attaches Dataplex Aspects (`has_calculation`, `has_physical_mapping`) and BigQuery Entry Links.
+### 2. 深度绑定与血缘构建 (Deep Binding: `bind_aspects.py`)
+扫描术语，解析其 `Description` 中的关联表和关联字段，并自动附加 Dataplex 切面 (`has_calculation`, `has_physical_mapping`) 以及 BigQuery 底层物理表和底层字段属性的强绑定实体链接 (Entry Links)。
+> Scans terms, parses their `Description` for related tables/columns, and automatically attaches Dataplex Aspects (`has_calculation`, `has_physical_mapping`) and BigQuery Entry Links for both entities and attributes/fields.
 ```bash
 python scripts/bind_aspects.py --project_id=YOUR_PROJECT --project_num=YOUR_PROJECT_NUM --glossary_id=YOUR_GLOSSARY_ID --json_file=extracted.json --dataset=YOUR_BQ_DATASET
 ```
