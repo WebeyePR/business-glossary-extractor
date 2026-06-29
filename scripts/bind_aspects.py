@@ -57,14 +57,17 @@ def main():
         aspects_to_update["dataplex-types.global.overview"] = overview_aspect
         
         custom_aspect_key = f"{args.project_num}.{args.location}.retail-business-logic"
-        if item.get("calculation_logic") or item.get("related_tables") or item.get("related_columns"):
+        data = {}
+        if item.get("calculation_logic"): data["calculation_logic"] = item.get("calculation_logic")
+        if item.get("related_tables") and item.get("related_tables") != ["*"]: data["related_tables"] = item.get("related_tables")
+        if item.get("related_columns"): data["related_columns"] = item.get("related_columns")
+        if item.get("stewards"): data["stewards"] = item.get("stewards")
+        if item.get("sensitivity"): data["sensitivity"] = item.get("sensitivity")
+        if item.get("lifecycle_status"): data["lifecycle_status"] = item.get("lifecycle_status")
+        
+        if data:
             custom_aspect = dataplex_v1.Aspect()
             custom_aspect.aspect_type = f"projects/{args.project_num}/locations/{args.location}/aspectTypes/retail-business-logic"
-            data = {}
-            if item.get("calculation_logic"): data["calculation_logic"] = item.get("calculation_logic")
-            if item.get("related_tables") and item.get("related_tables") != ["*"]: data["related_tables"] = item.get("related_tables")
-            if item.get("related_columns"): data["related_columns"] = item.get("related_columns")
-            
             custom_aspect.data = data
             aspects_to_update[custom_aspect_key] = custom_aspect
 
@@ -80,6 +83,7 @@ def main():
 
         # 2. Definition Links
         related_tables = item.get("related_tables", [])
+        related_columns = item.get("related_columns", [])
         if related_tables and related_tables != ["*"]:
             for table in related_tables:
                 table = table.strip()
@@ -118,6 +122,40 @@ def main():
                          print(f"  [-] BigQuery table entry not found -> {table}")
                     else:
                          print(f"  [-] Failed to link table {table}: {e}")
+                
+                # --- NEW LOGIC: Bidirectional Column Aspect Binding ---
+                if related_columns and related_columns != ["*"]:
+                    try:
+                        print(f"  [+] Injecting Business Context into BigQuery Columns for {table}...")
+                        bq_entry = client.get_entry(name=table_entry)
+                        
+                        col_aspects_to_update = {}
+                        if bq_entry.aspects:
+                            col_aspects_to_update = dict(bq_entry.aspects)
+                            
+                        col_updated = False
+                        for col in related_columns:
+                            col = col.strip()
+                            if not col: continue
+                            
+                            aspect_key = f"dataplex-types.global.overview@{col}"
+                            col_aspect = dataplex_v1.Aspect()
+                            col_aspect.aspect_type = "dataplex-types:overview"
+                            col_aspect.data = {
+                                "content": f"**关联业务术语 (Business Term)**: {display_name}\n\n**计算逻辑 (Calculation Logic)**:\n```sql\n{item.get('calculation_logic', 'N/A')}\n```"
+                            }
+                            col_aspects_to_update[aspect_key] = col_aspect
+                            col_updated = True
+                            
+                        if col_updated:
+                            update_bq_req = dataplex_v1.UpdateEntryRequest(
+                                entry=dataplex_v1.Entry(name=table_entry, aspects=col_aspects_to_update),
+                                update_mask={"paths": ["aspects"]}
+                            )
+                            robust_call(client.update_entry, request=update_bq_req)
+                            print(f"      -> Injected business context into {len(related_columns)} columns of {table}.")
+                    except Exception as e:
+                        print(f"      [-] Failed to inject column aspects into BigQuery table {table}: {e}")
 
 if __name__ == "__main__":
     main()

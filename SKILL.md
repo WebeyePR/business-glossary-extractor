@@ -45,7 +45,10 @@ Your intermediate JSON should look like this:
   "calculation_logic": "SQL or pseudo-code...",
   "related_tables": ["v_trd_dist_ord_dtl"],
   "related_columns": ["capacity", "ctg_name"],
-  "synonyms": ["5水", "5水SKU", "5水SKU门店"]
+  "synonyms": ["5水", "5水SKU", "5水SKU门店"],
+  "stewards": ["Name or Department (e.g., 王致昊)"],
+  "sensitivity": "Public, Internal, or Confidential",
+  "lifecycle_status": "Active or Deprecated"
 }
 ```
 
@@ -78,4 +81,4 @@ Always review the script parameters by reading the script file before executing 
 
 ## [Prompting Techniques for Extraction]
 When reading chunks, silently apply this internal prompt logic:
-*Does this paragraph define a metric? Does it mention a table? Is this a completely new term, or an elaboration on a term I found in Chunk 1?*
+*Does this paragraph define a metric? Does it mention a table? Is this a completely new term, or an elaboration on a term I found in Chunk 1? Who is the owner/steward? What is the data sensitivity level?*
