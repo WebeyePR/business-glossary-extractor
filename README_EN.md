@@ -6,10 +6,6 @@
 
 *Read this in other languages: [English](README_EN.md), [简体中文](README.md).*
 
-## 📸 Showcase
-
-> **[TODO: Add a screenshot here]** 
-> *Screenshot of the GCP BigQuery Console showing the Column-Level Aspect injected with business definitions and SQL logic.*
 
 ## 🎯 When do you need this?
 

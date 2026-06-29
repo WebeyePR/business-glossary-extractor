@@ -6,9 +6,12 @@ import requests
 import uuid
 
 def get_token():
-    credentials, project_id = google.auth.default()
-    credentials.refresh(Request())
-    return credentials.token, project_id
+    try:
+        credentials, project_id = google.auth.default()
+        credentials.refresh(Request())
+        return credentials.token, project_id
+    except google.auth.exceptions.DefaultCredentialsError:
+        raise Exception("\n[❌ 鉴权失败] 未找到有效的 Google Cloud 凭据。\n请执行 `gcloud auth application-default login` 进行本地身份认证。")
 
 def create_or_get_glossary(token, project_id, project_num, location, glossary_id):
     headers = {
@@ -41,6 +44,8 @@ def create_or_get_glossary(token, project_id, project_num, location, glossary_id
                     break
             time.sleep(2)
         return url.replace("https://dataplex.googleapis.com/v1/", "")
+    elif res_create.status_code == 403:
+        raise Exception("\n[❌ IAM 权限不足 (403 Forbidden)]\n请确认当前账号对项目具有 Dataplex Catalog Admin 权限，或您的凭据是否已过期。")
     else:
         raise Exception(f"Failed to create Glossary: {res_create.text}")
 
@@ -85,6 +90,8 @@ def create_or_get_category(token, project_id, project_num, location, glossary_id
                     break
             time.sleep(2)
         return f"projects/{project_num}/locations/{location}/glossaries/{glossary_id}/categories/{cat_id}"
+    elif res.status_code == 403:
+        raise Exception("\n[❌ IAM 权限不足 (403 Forbidden)]\n创建类别失败，请确认是否具有 Dataplex 相应写入权限。")
     else:
         raise Exception(f"Failed to trigger category creation: {res.text}")
 
@@ -101,6 +108,8 @@ def create_term(token, project_id, parent_resource, term_id, payload, base_gloss
         return "CREATED"
     elif res.status_code == 409:
         return "ALREADY_EXISTS"
+    elif res.status_code == 403:
+        raise Exception("\n[❌ IAM 权限不足 (403 Forbidden)]\n创建术语失败，请确认是否具有 Dataplex 相应写入权限。")
     else:
         raise Exception(f"Term creation request failed: {res.text}")
 

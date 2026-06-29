@@ -6,10 +6,6 @@
 
 *其他语言版本: [English](README_EN.md), [简体中文](README.md).*
 
-## 📸 Showcase (视觉震撼)
-
-> **[TODO: 在这里添加一张截图]** 
-> *展示 BigQuery 控制台中，字段级切面 (Column-Level Aspect) 成功注入业务定义和 SQL 逻辑的真实截图。*
 
 ## 🎯 你什么时候需要它？
 

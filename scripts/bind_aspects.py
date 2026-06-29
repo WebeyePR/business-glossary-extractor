@@ -2,7 +2,7 @@ import argparse
 import json
 import time
 from google.cloud import dataplex_v1
-from google.api_core.exceptions import AlreadyExists
+from google.api_core.exceptions import AlreadyExists, PermissionDenied
 
 def robust_call(func, *args, **kwargs):
     for attempt in range(3):
@@ -78,6 +78,8 @@ def main():
             req = dataplex_v1.UpdateEntryRequest(entry=entry, update_mask={"paths": ["aspects"]})
             robust_call(client.update_entry, request=req)
             print("  [+] Aspects updated")
+        except PermissionDenied:
+            print(f"  [-] ❌ IAM 权限不足 (403): 无法更新 Aspect，请确认您具有 Dataplex Catalog Admin 权限。")
         except Exception as e:
             print(f"  [-] Failed to update aspects: {e}")
 
@@ -115,6 +117,8 @@ def main():
                     print(f"  [+] Definition Link created -> {table}")
                 except AlreadyExists:
                     print(f"  [ℹ️] Definition Link already exists -> {table}")
+                except PermissionDenied:
+                    print(f"  [-] ❌ IAM 权限不足 (403): 无法创建关联表 Entry Link，请确认相关 BigQuery 表的权限。")
                 except Exception as e:
                     if "already exists" in str(e).lower() or "duplicate" in str(e).lower():
                         print(f"  [ℹ️] Definition Link already exists -> {table}")
@@ -154,6 +158,8 @@ def main():
                             )
                             robust_call(client.update_entry, request=update_bq_req)
                             print(f"      -> Injected business context into {len(related_columns)} columns of {table}.")
+                    except PermissionDenied:
+                        print(f"      [-] ❌ IAM 权限不足 (403): 无法将业务信息注入 BigQuery 字段切面，请确认表权限。")
                     except Exception as e:
                         print(f"      [-] Failed to inject column aspects into BigQuery table {table}: {e}")
 

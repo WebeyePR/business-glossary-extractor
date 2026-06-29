@@ -12,9 +12,13 @@ def main():
     parser.add_argument("--glossary_id", required=True, help="Glossary ID")
     args = parser.parse_args()
 
-    credentials, project_id_auth = google.auth.default()
-    credentials.refresh(Request())
-    token = credentials.token
+    try:
+        credentials, project_id_auth = google.auth.default()
+        credentials.refresh(Request())
+        token = credentials.token
+    except google.auth.exceptions.DefaultCredentialsError:
+        print("\n[❌ 鉴权失败] 未找到有效的 Google Cloud 凭据。\n请执行 `gcloud auth application-default login` 进行本地身份认证。")
+        return
 
     headers = {
         "Authorization": f"Bearer {token}",
@@ -36,6 +40,9 @@ def main():
         if res_terms.status_code != 200:
             if res_terms.status_code == 404:
                 print("Glossary not found. Nothing to delete.")
+                return
+            elif res_terms.status_code == 403:
+                print("\n[❌ IAM 权限不足 (403)] 无法列出术语，请确认是否具有 Dataplex Catalog Admin 权限。")
                 return
             print(f"Error listing terms: {res_terms.text}")
             break
@@ -81,7 +88,10 @@ def main():
     time.sleep(5)
     
     res = requests.delete(url_base, headers=headers)
-    print(f"Glossary delete status: {res.status_code}")
+    if res.status_code == 403:
+        print("\n[❌ IAM 权限不足 (403)] 删除 Glossary 本体失败。")
+    else:
+        print(f"Glossary delete status: {res.status_code}")
 
     time.sleep(5)
     res_check = requests.get(url_base, headers=headers)
