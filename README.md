@@ -4,6 +4,13 @@
 
 [![Agent Skill](https://img.shields.io/badge/Agent-Skill-blue.svg)](https://github.com/WebeyePR/gcp-kc-glossary-builder) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
+*其他语言版本: [English](README_EN.md), [简体中文](README.md).*
+
+## 📸 Showcase (视觉震撼)
+
+> **[TODO: 在这里添加一张截图]** 
+> *展示 BigQuery 控制台中，字段级切面 (Column-Level Aspect) 成功注入业务定义和 SQL 逻辑的真实截图。*
+
 ## 🎯 你什么时候需要它？
 
 1. **RAG / Text-to-SQL 落地卡壳**：大模型把“5水门店”理解成了“5个卖水的店”，导致生成的 SQL 完全跑错。你需要把真正的业务逻辑喂给 AI 的检索底座。
