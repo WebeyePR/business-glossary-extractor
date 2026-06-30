@@ -1,0 +1,49 @@
+[
+  {
+    "category": "销售域",
+    "category_desc": "与销售订单相关的业务指标与实体",
+    "term": "近7日活跃门店数",
+    "definition": "最近7天内有过成功履约订单的线下实体门店总数。",
+    "calculation_logic": "SELECT COUNT(DISTINCT store_id) FROM `retail_dwh.orders` WHERE order_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY) AND status = 'COMPLETED'",
+    "related_tables": [
+      "orders",
+      "stores"
+    ],
+    "related_columns": [
+      "store_id",
+      "order_date"
+    ],
+    "synonyms": [
+      "7天活跃门店",
+      "周活跃门店"
+    ],
+    "stewards": [
+      "数据分析组-张三"
+    ],
+    "sensitivity": "Internal",
+    "lifecycle_status": "Active"
+  },
+  {
+    "category": "用户域",
+    "category_desc": "用户行为与画像标签",
+    "term": "高价值用户",
+    "definition": "历史累计消费金额大于 10,000 元且最近 30 天有过消费的用户。",
+    "calculation_logic": "SELECT user_id FROM `retail_dwh.user_summary` WHERE lifetime_value > 10000 AND days_since_last_purchase <= 30",
+    "related_tables": [
+      "user_summary"
+    ],
+    "related_columns": [
+      "user_id",
+      "lifetime_value"
+    ],
+    "synonyms": [
+      "VIP用户",
+      "核心客户"
+    ],
+    "stewards": [
+      "用户运营组-李四"
+    ],
+    "sensitivity": "Confidential",
+    "lifecycle_status": "Active"
+  }
+]

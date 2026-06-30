@@ -2,7 +2,10 @@
   "name": "gcp-kc-glossary-builder",
   "version": "1.0.0",
   "description": "GCP Knowledge Catalog Glossary Builder agent skill",
-  "main": "scripts/import_glossary.py",
+  "main": "mcp_server.py",
+  "bin": {
+    "business-glossary-mcp": "./bin/run-mcp.sh"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
